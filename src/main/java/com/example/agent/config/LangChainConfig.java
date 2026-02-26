@@ -1,5 +1,6 @@
 package com.example.agent.config;
 
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.service.AiServices;
 import com.example.agent.agent.BacklogAgent;
@@ -7,14 +8,17 @@ import com.example.agent.tools.AgentTool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.time.Duration;
 import java.util.List;
 
 @Configuration
 public class LangChainConfig {
+
   @Bean
-  public GoogleAiGeminiChatModel googleAiGeminiChatModel(
+  @Profile("!ci")
+  public ChatModel googleAiGeminiChatModel(
           @Value("${gemini.api-key}") String apiKey,
           @Value("${gemini.model}") String model,
           @Value("${gemini.timeout-seconds:60}") Integer timeoutSeconds
@@ -27,7 +31,7 @@ public class LangChainConfig {
   }
 
   @Bean
-  public BacklogAgent backlogAgent(GoogleAiGeminiChatModel model, List<AgentTool> tools) {
+  public BacklogAgent backlogAgent(ChatModel model, List<AgentTool> tools) {
 
     System.out.println("=== Agent tools loaded: " + tools.size() + " ===");
     tools.forEach(t -> System.out.println(" - " + t.getClass().getName()));
