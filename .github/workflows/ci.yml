@@ -43,7 +43,7 @@ jobs:
       - name: Build Docker image inside Minikube
         run: |
           eval $(minikube -p minikube docker-env)
-          docker build -t ai-agent:ci .
+          docker build --build-arg SKIP_TESTS=true -t ai-agent:ci .
 
       - name: Deploy to Minikube
         run: kubectl apply -f src/main/k8s/ai-agent-deployment.yml
@@ -52,15 +52,17 @@ jobs:
         run: |
           kubectl wait --for=condition=Ready pod -l app=ai-agent --timeout=180s
           kubectl get pods
-          minikube service list
 
       - name: Test service health endpoint
         uses: nick-fields/retry@v3
         with:
-          timeout_seconds: 10
+          timeout_seconds: 15
           max_attempts: 6
           command: |
-            curl -fsS "$(minikube service ai-agent --url)/actuator/health"
+            kubectl port-forward svc/ai-agent 8080:8080 &
+            sleep 3
+            curl -fsS http://localhost:8080/actuator/health
+            kill %1 2>/dev/null || true
 
       - name: Log pods on failure
         if: failure()
