@@ -13,9 +13,9 @@ if (!TOKEN) {
 }
 
 // Command to start the official GitHub MCP server (STDIO)
-const COMMAND = process.env.GITHUB_MCP_CMD || "docker";
+const COMMAND = process.env.GITHUB_MCP_CMD || "npx";
 const ARGS = (process.env.GITHUB_MCP_ARGS ||
-    `run --rm -i -e GITHUB_PERSONAL_ACCESS_TOKEN=${TOKEN} ghcr.io/github/github-mcp-server`
+    `@modelcontextprotocol/server-github`
 ).split(" ");
 
 const transport = new StdioClientTransport({
