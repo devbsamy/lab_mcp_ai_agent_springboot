@@ -2,12 +2,12 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install Docker CLI (client only)
-RUN apk add --no-cache docker-cli
-
 # Install wrapper deps
 COPY package.json package-lock.json* ./
 RUN npm install --omit=dev
+
+# Install the GitHub MCP server globally so npx finds it instantly
+RUN npm install -g @modelcontextprotocol/server-github
 
 # Copy wrapper source
 COPY src ./src
